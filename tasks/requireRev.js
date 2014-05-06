@@ -21,6 +21,19 @@ var reset   = '\u001b[0m';
 
 module.exports = function(grunt) {
   
+  /**
+   * @doc overview
+   * @id grunt-require-rev
+   * @name Grunt Require Rev
+   *
+   * @description
+     RequireJSにより遅延ローディングされるリソースに対してキャッシュ対応処理を行います。
+     
+     ```shell
+     $ grunt requireRev
+     ```
+     
+   */
   grunt.registerMultiTask('requireRev', 'File revisioning for requrejs.', function() {
     
     // Merge task-specific and/or target-specific options with these defaults.
