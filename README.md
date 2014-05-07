@@ -1,6 +1,7 @@
 # grunt-require-rev
 
-> File revisioning for requrejs.
+> File revisioning for RequireJS dependencies.
+This can be useful for caching and cache-busting with RequireJS.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.2`
@@ -17,14 +18,14 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-require-rev');
 ```
 
-## The "require_rev" task
+## The "requireRev" task
 
 ### Overview
-In your project's Gruntfile, add a section named `require_rev` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `requireRev` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
-  require_rev: {
+  requireRev: {
     options: {
       // Task-specific options go here.
     },
@@ -37,47 +38,60 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
+#### options.rev.algorithm
 Type: `String`
-Default value: `',  '`
+Default value: `'md5'`
 
-A string value that is used to do something with whatever.
+A string value that is used to do revisioning files.
 
-#### options.punctuation
+#### options.rev.length
+Type: `Number`
+Default value: `8`
+
+A number value that is used to do revisioning files.
+
+#### options.requirejs.baseUrl
 Type: `String`
-Default value: `'.'`
-
-A string value that is used to do something else with whatever else.
+Default value: `'(scripts|styles)'`
 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
 
 ```js
 grunt.initConfig({
-  require_rev: {
+  requireRev: {
     options: {},
     files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+      src: [
+        'dist/scripts/**/*.js',
+        'dist/styles/*.css'
+      ]
+    }
   },
 });
 ```
 
 #### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
 
 ```js
 grunt.initConfig({
-  require_rev: {
+  requireRev: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
+      rev: {
+        algorithm: 'md5',
+        length: 4
+      },
+      requirejs: {
+        baseUrl: '(scripts|styles)', 
+      }
     },
     files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+      src: [
+        'dist/scripts/**/*.js',
+        'dist/styles/*.css'
+      ]
+    }
   },
 });
 ```
