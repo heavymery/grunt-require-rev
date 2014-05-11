@@ -21,25 +21,21 @@ var reset   = '\u001b[0m';
 
 module.exports = function(grunt) {
   
-  /**
-   * @doc overview
-   * @id grunt-require-rev
-   * @name Grunt Require Rev
-   *
-   * @description
-     RequireJSにより遅延ローディングされるリソースに対してキャッシュ対応処理を行います。
-     
-     ```shell
-     $ grunt requireRev
-     ```
-     
-   */
+  var createHashFromFile = function(filepath, fileEncoding, hashAlgorithm, hashEncoding) {
+    var hash = crypto.createHash(hashAlgorithm);
+    hash.update(grunt.file.read(filepath), fileEncoding);
+    grunt.verbose.ok('Hashing ' + filepath + '...');
+    return hash.digest(hashEncoding);
+  }
+  
   grunt.registerMultiTask('requireRev', 'File revisioning for requrejs.', function() {
     
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      rev: {
+      hash: {
         algorithm: 'md5',
+        encoding: 'hex',
+        inputEncoding: 'utf8',
         length: 8
       },
       requirejs: {
@@ -47,48 +43,36 @@ module.exports = function(grunt) {
       }
     });
     
-    // RequireJSの依存モジュール記述中のパスのパターン
-    // 例："~"
-    var requirePathPattern = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
+    var dependencyPathPattern 
+      = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
+      // e.g. 'app', "controllers/main", "css!/styles/main"
     
-    // RequireJSの依存モジュール記述パターン
-    
-    // 例：define("~",["app","~"],
-    // 例：define(["app","~"],
     var definePattern 
-      = new RegExp('define\\s*\\(\\s*(' + requirePathPattern.source + '\\s*,?\\s*)*\\s*\\[\\s*(' + requirePathPattern.source + '\\s*,?\\s*)*\\s*\\]', 'ig');
+      = new RegExp('define\\s*\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\s*\\]', 'ig');
+      // e.g. define("moduleName",["app","controllers/main"]... define(["app","controllers/main"]...
     
-    // 例：require(['~'], 
     var requirePattern 
-      = new RegExp('require\\s*\\(\\s*\\[\\s*(' + requirePathPattern.source + '\\s*,?\\s*)*\\]\\s*,', 'ig');
-      
-      
-    // 例：dependencies: ['css!../~','~']
-    // 例：dependencies.push('~');
+      = new RegExp('require\\s*\\(\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*,', 'ig');
+      // e.g. require(['app'], 
+    
     var dependenciesPattern 
-      = new RegExp('(dependencies\\s*:\\s*\\[\\s*(' + requirePathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(dependencies\\s*\\.\\s*push\\(\\s*(' + requirePathPattern.source + '\\s*,?\\s*)*)', 'ig');
+      = new RegExp('(dependencies\\s*:\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(dependencies\\s*\\.\\s*push\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*)', 'ig');
+      // e.g. dependencies: ['css!../~','~']... dependencies.push('~');
     
-    // フォルダーパスのパターン
     var dirPathPattern = new RegExp('[\\w\\d-_/.]*');
-    // ファイル名のパターン
-    var filePathPattern = new RegExp('([a-z0-9]{8}\\.)?(([\\w\\d-_/.!]+)\\.(js|css|html))');
     
-    // ファイルパスから RequireJS 依存関係パスを抽出
-    var fileToRequirePath = function(filePath) {
+    var filePathPattern = new RegExp('([a-z0-9]{' + options.hash.length + '}\\.)?(([\\w\\d-_/.!]+)\\.(js|css|html))');
+    
+    var fileToDependencyPath = function(filePath) {
       var regexp = new RegExp(options.requirejs.baseUrl + '/?(' + dirPathPattern.source + ')/' + filePathPattern.source);
       var pathMatch = filePath.match(regexp);
       if(!pathMatch) return '';
-      
-      //console.log(filePath);
-      //console.log(regexp);
-      //console.log(pathMatch);
-      //console.log(pathMatch);
       
       var path = '';
       var pathOrigin = '';
       var patternSource = '';
       
-      // RequireJSのルートパス後のフォルダーパス
+      // TODO: オプション化
       if(pathMatch[1] === 'styles') {
         // CSSはRequireCSS用の特殊なパスに変換
         path += 'css!/styles/';
@@ -102,8 +86,8 @@ module.exports = function(grunt) {
         }
       }
       
-      // ハッシュプレーフィックスのパターン
-      patternSource += '([a-z0-9]{8}\\.)?';
+      // add hash prefix pattern
+      patternSource += '([a-z0-9]{' + options.hash.length + '}\\.)?';
       
       // ハッシュプレーフィックス
       if(pathMatch[3] && pathMatch[3].length>0) {
@@ -136,14 +120,6 @@ module.exports = function(grunt) {
     var fs = require('fs');
     var path = require('path');
     var crypto = require('crypto');
-    
-    // ファイルの内容からハッシュ文字列を生成する処理
-    var md5 = function(filepath, algorithm, encoding) {
-      var hash = crypto.createHash(algorithm);
-      grunt.verbose.ok('Hashing ' + filepath + '...');
-      hash.update(grunt.file.read(filepath));
-      return hash.digest(encoding);
-    }
     
     // 対象ファイルを全て抽出
     var targetFiles = [];
@@ -183,16 +159,16 @@ module.exports = function(grunt) {
       
       if(defineMatchs) {
         defineMatchs.forEach(function(defineMatch) {
-          var pathMatchs = defineMatch.match(requirePathPattern);
+          var pathMatchs = defineMatch.match(dependencyPathPattern);
           if(pathMatchs) {
-            dependencies = dependencies.concat(defineMatch.match(requirePathPattern));
+            dependencies = dependencies.concat(defineMatch.match(dependencyPathPattern));
           }
         });
       }
       
       if(requireMatchs) {
         requireMatchs.forEach(function(requireMatch) {
-          var pathMatchs = requireMatch.match(requirePathPattern);
+          var pathMatchs = requireMatch.match(dependencyPathPattern);
           if(pathMatchs) {
             dependencies = dependencies.concat(pathMatchs);
           }
@@ -201,7 +177,7 @@ module.exports = function(grunt) {
       
       if(dependenciesMatchs) {
         dependenciesMatchs.forEach(function(dependenciesMatch) {
-          var pathMatchs = dependenciesMatch.match(requirePathPattern);
+          var pathMatchs = dependenciesMatch.match(dependencyPathPattern);
           if(pathMatchs) {
             dependencies = dependencies.concat(pathMatchs);
           }
@@ -224,7 +200,7 @@ module.exports = function(grunt) {
       }
       
       dependenciesMap[targetPath] = {};
-      dependenciesMap[targetPath].requirePath = fileToRequirePath(targetPath);
+      dependenciesMap[targetPath].requirePath = fileToDependencyPath(targetPath);
       dependenciesMap[targetPath].dependencies = dependencies;
     }); // targetFiles.forEach
 
@@ -300,15 +276,15 @@ module.exports = function(grunt) {
     for(var i=0; i<targetFilesSorted.length; i++) {
       var targetPath = targetFilesSorted[i];
       
-      var hash = md5(targetPath, options.rev.algorithm, 'hex');
-      var prefix = hash.slice(0, options.rev.length);
+      var hash = createHashFromFile(targetPath, options.hash.inputEncoding, options.hash.algorithm, options.hash.encoding);
+      var prefix = hash.slice(0, options.hash.length);
       //console.log(targetPath);
       var originName = path.basename(targetPath);
       //console.log(originName);
       
       // すでにハッシュプレーフィックスが付いてる場合は除去
       var filePathMatch = originName.match(filePathPattern);
-      if(filePathMatch && filePathMatch[1] && filePathMatch[1].match(/\d/)) { // 先頭8文字のうち数字が入っていれば八種文字列として判断
+      if(filePathMatch && filePathMatch[1] && filePathMatch[1].match(/\d/)) {
         originName = filePathMatch[2];
       }
       
@@ -320,7 +296,7 @@ module.exports = function(grunt) {
       grunt.verbose.ok();
       
       // RequireJS用パス情報を更新
-      dependenciesMap[targetPath].requirePath = fileToRequirePath(targetPathNew);
+      dependenciesMap[targetPath].requirePath = fileToDependencyPath(targetPathNew);
       
       for(var j=i+1; j<targetFilesSorted.length; j++) {
         var otherPath = targetFilesSorted[j];
