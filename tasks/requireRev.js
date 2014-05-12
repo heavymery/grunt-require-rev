@@ -19,6 +19,11 @@ var cyan    = '\u001b[36m';
 var white   = '\u001b[37m';
 var reset   = '\u001b[0m';
 
+// file hashing modules
+var fs = require('fs');
+var path = require('path');
+var crypto = require('crypto');
+
 module.exports = function(grunt) {
   
   var createHashFromFile = function(filepath, fileEncoding, hashAlgorithm, hashEncoding) {
@@ -43,6 +48,10 @@ module.exports = function(grunt) {
       }
     });
     
+    var dirPathPattern = new RegExp('[\\w\\d-_/.]*');
+    
+    var filePathPattern = new RegExp('([a-z0-9]{' + options.hash.length + '}\\.)?(([\\w\\d-_/.!]+)\\.(js|css|html))');
+    
     var dependencyPathPattern 
       = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
       // e.g. 'app', "controllers/main", "css!/styles/main"
@@ -52,16 +61,23 @@ module.exports = function(grunt) {
       // e.g. define("moduleName",["app","controllers/main"]... define(["app","controllers/main"]...
     
     var requirePattern 
-      = new RegExp('require\\s*\\(\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*,', 'ig');
-      // e.g. require(['app'], 
+      = new RegExp('(require\\s*\\(\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(require\\s*\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*)', 'ig');
+      // e.g. require(['app']... require('app'...
     
     var dependenciesPattern 
-      = new RegExp('(dependencies\\s*:\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(dependencies\\s*\\.\\s*push\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*)', 'ig');
-      // e.g. dependencies: ['css!../~','~']... dependencies.push('~');
+      = new RegExp('(dependencies\\s*(:|=)\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(dependencies\\s*\\.\\s*push\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*)', 'ig');
+      // e.g. dependencies: ['css!../~','~']... dependencies = ['css!../~','~']... dependencies.push('~');
     
-    var dirPathPattern = new RegExp('[\\w\\d-_/.]*');
-    
-    var filePathPattern = new RegExp('([a-z0-9]{' + options.hash.length + '}\\.)?(([\\w\\d-_/.!]+)\\.(js|css|html))');
+    var matchPatternFromArray = function(array, pattern) {
+      for(var i=0; i<array.length; i++) {
+        var match = array[i].match(pattern);
+        if(match) {
+          return match;
+        }
+      }
+      
+      return null;
+    };
     
     var fileToDependencyPath = function(filePath) {
       var regexp = new RegExp(options.requirejs.baseUrl + '/?(' + dirPathPattern.source + ')/' + filePathPattern.source);
@@ -72,6 +88,7 @@ module.exports = function(grunt) {
       var pathOrigin = '';
       var patternSource = '';
       
+      // set dir name
       // TODO: オプション化
       if(pathMatch[1] === 'styles') {
         // CSSはRequireCSS用の特殊なパスに変換
@@ -89,7 +106,7 @@ module.exports = function(grunt) {
       // add hash prefix pattern
       patternSource += '([a-z0-9]{' + options.hash.length + '}\\.)?';
       
-      // ハッシュプレーフィックス
+      // add hash prefix
       if(pathMatch[3] && pathMatch[3].length>0) {
         path += pathMatch[3];
         
@@ -100,13 +117,14 @@ module.exports = function(grunt) {
         }
       }
       
-      // 拡張子を除いたファイル名
+      // add file name (exclude extension)
       if(pathMatch[5] && pathMatch[5].length>0) {
         path += pathMatch[5];
         pathOrigin += pathMatch[5];
         patternSource += pathMatch[5];
       }
       
+      // create regular expression 
       var pattern = new RegExp(patternSource, 'ig');
       
       return {
@@ -116,12 +134,10 @@ module.exports = function(grunt) {
       }
     };
     
-    // キャッシュ対応に使う NodeJS モジュール
-    var fs = require('fs');
-    var path = require('path');
-    var crypto = require('crypto');
+    //--------------------------------------
+    // 1. get target files
+    //--------------------------------------
     
-    // 対象ファイルを全て抽出
     var targetFiles = [];
     
     this.files.forEach(function(filePair) {
@@ -135,10 +151,13 @@ module.exports = function(grunt) {
     grunt.verbose.writeln(green + targetFiles.join('\n') + reset);
     grunt.verbose.writeln();
     
-    // 各ファイルの依存関係マップ（key: ファイルパス、value: 依存関係パスの配列）
+    //--------------------------------------
+    // 2. create dependencies map
+    //  (key: filePath, value: dependencies)
+    //--------------------------------------
+    
     var dependenciesMap = {};
     
-    // 対象のファイルを読み込んで RequireJS の依存関係が記載された部分を抽出
     targetFiles.forEach(function(targetPath) {
       
       var contents = grunt.file.read(targetPath);
@@ -147,14 +166,12 @@ module.exports = function(grunt) {
       var requireMatchs = contents.match(requirePattern);
       var dependenciesMatchs = contents.match(dependenciesPattern);
       
-      // ちゃんと検索されてるか確認
       grunt.verbose.writeln('Define matchs:\n' + cyan + defineMatchs + reset);
       grunt.verbose.writeln('Require matchs:\n' + cyan + requireMatchs + reset);
       grunt.verbose.writeln('Dependencies matchs:\n' + cyan + dependenciesMatchs + reset);
       grunt.verbose.writeln();
       
-      // その中から依存関係パスのみを抽出
-      
+      // dependency path array
       var dependencies = [];
       
       if(defineMatchs) {
@@ -183,13 +200,13 @@ module.exports = function(grunt) {
           }
         });
       }
-
-      // 依存関係パスから「'」と「"」を除去
+      
+      // remove quotation mark
       for(var i=0; i<dependencies.length; i++) {
         dependencies[i] = dependencies[i].replace(/'|"/g,'');
       }
-
-      // 重複するパスアイテムを削除
+      
+      // remove duplicate dependency path
       for(var i=0; i<dependencies.length; i++) {
         var target = dependencies[i];
         var indexOfNext = dependencies.indexOf(target, i + 1);
@@ -200,32 +217,13 @@ module.exports = function(grunt) {
       }
       
       dependenciesMap[targetPath] = {};
-      dependenciesMap[targetPath].requirePath = fileToDependencyPath(targetPath);
+      dependenciesMap[targetPath].dependencyPath = fileToDependencyPath(targetPath);
       dependenciesMap[targetPath].dependencies = dependencies;
-    }); // targetFiles.forEach
-
-    // 配列の中からパターンマッチ結果を返す
-    var matchPatternArray = function(array, pattern) {
-      //console.log(array);
-      //console.log(pattern);
-
-      for(var i=0; i<array.length; i++) {
-        //console.log(array[i]);
-        var match = array[i].match(pattern);
-        if(match) {
-          //console.log('match!');
-          return match;
-        }
-      }
-      
-      return null;
-    };
+    });
     
-    //console.log();
-    //console.log(green + targetFiles.join('\n') + reset);
-    //console.log();
-    
-    // 対象のファイルリストを依存関係順にソート
+    //--------------------------------------
+    // 3. order by dependencies
+    //--------------------------------------
     
     var targetFilesSorted = [];
     
@@ -237,16 +235,14 @@ module.exports = function(grunt) {
           var targetFile = targetFilesSorted[i];
           var dependencies = dependenciesMap[targetFile].dependencies;
           
-          //console.log(nextTarget);
-          var dependencyMatch = matchPatternArray(dependencies, dependenciesMap[nextTarget].requirePath.pattern);
-          //console.log(red + dependencyMatch + reset);
+          var dependencyMatch = matchPatternFromArray(dependencies, dependenciesMap[nextTarget].dependencyPath.pattern);
+          
           if(dependencyMatch) {
-            //console.log(red + 'break!' + reset);
             break;
           }
         }
         
-        // 依存しているファイルを前に持って行く
+        // move dependent file to front
         targetFilesSorted.splice(i, 0, nextTarget);
         
       } else {
@@ -256,15 +252,17 @@ module.exports = function(grunt) {
     
     grunt.verbose.writeln();
     
-    // ファイル名を変更し、参照する箇所のパスも更新
+    //--------------------------------------
+    // 4. hashing & replace dependency path
+    //--------------------------------------
     
     targetFilesSorted.forEach(function(targetPath) {
       var dependencies = dependenciesMap[targetPath].dependencies;
       
       grunt.verbose.ok('Target ' + targetPath + ' (' 
-        + dependenciesMap[targetPath].requirePath.path + ' | ' 
-        + dependenciesMap[targetPath].requirePath.pathOrigin + ' | ' 
-        + dependenciesMap[targetPath].requirePath.pattern + ')');
+        + dependenciesMap[targetPath].dependencyPath.path + ' | ' 
+        + dependenciesMap[targetPath].dependencyPath.pathOrigin + ' | ' 
+        + dependenciesMap[targetPath].dependencyPath.pattern + ')');
       
       grunt.verbose.writeln(red + dependencies.length + reset + ' dependencies found.');
       if(dependencies && dependencies.length > 0) {
@@ -275,14 +273,12 @@ module.exports = function(grunt) {
     
     for(var i=0; i<targetFilesSorted.length; i++) {
       var targetPath = targetFilesSorted[i];
+      var originName = path.basename(targetPath);
       
       var hash = createHashFromFile(targetPath, options.hash.inputEncoding, options.hash.algorithm, options.hash.encoding);
       var prefix = hash.slice(0, options.hash.length);
-      //console.log(targetPath);
-      var originName = path.basename(targetPath);
-      //console.log(originName);
       
-      // すでにハッシュプレーフィックスが付いてる場合は除去
+      // clear hash prefix from file name
       var filePathMatch = originName.match(filePathPattern);
       if(filePathMatch && filePathMatch[1] && filePathMatch[1].match(/\d/)) {
         originName = filePathMatch[2];
@@ -291,25 +287,25 @@ module.exports = function(grunt) {
       var targetPathNew = path.dirname(targetPath) + '/' + prefix + '.' +  originName;
       grunt.verbose.write('Rename ' + targetPath + ' to ' + targetPathNew + '...');
       
-      // ファイル名を更新
+      // rename file (adding hash prefix)
       fs.renameSync(targetPath, targetPathNew);
       grunt.verbose.ok();
       
-      // RequireJS用パス情報を更新
-      dependenciesMap[targetPath].requirePath = fileToDependencyPath(targetPathNew);
+      // replace dependency path
+      dependenciesMap[targetPath].dependencyPath = fileToDependencyPath(targetPathNew);
       
       for(var j=i+1; j<targetFilesSorted.length; j++) {
         var otherPath = targetFilesSorted[j];
         
-        var dependencyMatch = matchPatternArray(dependenciesMap[otherPath].dependencies, dependenciesMap[targetPath].requirePath.pattern);
+        var dependencyMatch = matchPatternFromArray(dependenciesMap[otherPath].dependencies, dependenciesMap[targetPath].dependencyPath.pattern);
         if(dependencyMatch) {
           grunt.verbose.ok('Replace require path for ' + otherPath + '...');
 
           var contents = grunt.file.read(otherPath);
           
           grunt.file.write(otherPath, contents.replace(
-            new RegExp('("|\')' + dependenciesMap[targetPath].requirePath.pattern.source + '("|\')', 'ig'), 
-            '$1' + dependenciesMap[targetPath].requirePath.path + '$3'
+            new RegExp('("|\')' + dependenciesMap[targetPath].dependencyPath.pattern.source + '("|\')', 'ig'), 
+            '$1' + dependenciesMap[targetPath].dependencyPath.path + '$3'
           ));
         }
       }
@@ -317,6 +313,7 @@ module.exports = function(grunt) {
       grunt.verbose.writeln();
     }
     
-  });
-
-};
+    
+  }); // grunt.registerMultiTask
+  
+}; // module.exports
