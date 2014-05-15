@@ -43,8 +43,9 @@ module.exports = function(grunt) {
         inputEncoding: 'utf8',
         length: 8
       },
-      requirejs: {
-        baseUrl: '(scripts|styles)', // カッコは必須
+      paths: { // key: file path, value: requirejs dependency path
+        'scripts': '', // like as requirejs baseUrl == '/scripts'
+        'styles': 'css!/styles/' // for requireCSS
       }
     });
     
@@ -80,27 +81,25 @@ module.exports = function(grunt) {
     };
     
     var fileToDependencyPath = function(filePath) {
-      var regexp = new RegExp(options.requirejs.baseUrl + '/?(' + dirPathPattern.source + ')/' + filePathPattern.source);
+      var fileBasePathPattern = '(' + Object.keys(options.paths).join('|') + ')';
+      var regexp = new RegExp(fileBasePathPattern + '/?(' + dirPathPattern.source + ')/' + filePathPattern.source);
+      
       var pathMatch = filePath.match(regexp);
       if(!pathMatch) return '';
       
-      var path = '';
-      var pathOrigin = '';
-      var patternSource = '';
+      var fileBasePath = pathMatch[1];
+      var dependencyBasePath = options.paths[fileBasePath];
       
-      // set dir name
-      // TODO: オプション化
-      if(pathMatch[1] === 'styles') {
-        // CSSはRequireCSS用の特殊なパスに変換
-        path += 'css!/styles/';
-        pathOrigin += 'css!/styles/';
-        patternSource += 'css!/styles/'.replace(/\//g,'\\/');
-      } else {
-        if(pathMatch[2] && pathMatch[2].length>0) {
-          path += pathMatch[2] + '/';
-          pathOrigin += pathMatch[2] + '/'; 
-          patternSource += pathMatch[2].replace(/\//g,'\\/') + '\\/';
-        }
+      // set base dependency path
+      var path = dependencyBasePath;
+      var pathOrigin = dependencyBasePath;
+      var patternSource = dependencyBasePath.replace(/\//g,'\\/');
+      
+      // add sub dependency path
+      if(pathMatch[2] && pathMatch[2].length>0) {
+        path += pathMatch[2] + '/';
+        pathOrigin += pathMatch[2] + '/'; 
+        patternSource += pathMatch[2].replace(/\//g,'\\/') + '\\/';
       }
       
       // add hash prefix pattern
@@ -109,12 +108,6 @@ module.exports = function(grunt) {
       // add hash prefix
       if(pathMatch[3] && pathMatch[3].length>0) {
         path += pathMatch[3];
-        
-        // ハッシュプレーフィックスではない場合もあるのでチィック（数字が入っていれば）
-        if(!pathMatch[3].match(/\d/)) {
-          pathOrigin += pathMatch[3];
-          patternSource += pathMatch[3];
-        }
       }
       
       // add file name (exclude extension)
