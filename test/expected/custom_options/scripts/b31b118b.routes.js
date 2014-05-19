@@ -1,6 +1,6 @@
 'use strict';
 
-define([
+define('routes', [
   'angular-route',
   '8fb5d34c.app'
 ], function (ngRoute, app) {
@@ -52,6 +52,11 @@ define([
   app.config(['$routeProvider', function($routeProvider) {
     
     angular.forEach(routes, function(route, path) {
+      if(route == '/about') {
+        route.dependencies.push('services/d3dc6308.twitter');
+        route.dependencies.push('services/86949311.facebook');
+      }
+      
       $routeProvider.when(path, {
         templateUrl:route.templateUrl, 
         resolve:dependencyResolver(route.dependencies)

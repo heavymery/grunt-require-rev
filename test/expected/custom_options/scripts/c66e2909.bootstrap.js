@@ -36,7 +36,7 @@ require([
     'require-css', 
     'angular', 
     '8fb5d34c.app', 
-    '279acf09.routes', 
+    'b31b118b.routes', 
     'controllers/5daa89c5.main',
   ],
   function(requireCss, angular, app) {

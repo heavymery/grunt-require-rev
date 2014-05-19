@@ -1,6 +1,6 @@
 'use strict';
 
-define(['app'], function(app) {
+define(['8fb5d34c.app'], function(app) {
   
   app.controller('MainCtrl', [
     '$scope',
@@ -22,12 +22,12 @@ define(['app'], function(app) {
       $scope.getNewFeeds = function() {
         switch($scope.selectedSNSType) {
           case 'facebook':
-            require('services/facebook', function(facebook){
+            require('services/86949311.facebook', function(facebook){
               $scope.feeds = facebook.getNewFeeds();
             });
             break;
           case 'twitter':
-            require('services/twitter', function(twitter){
+            require('services/d3dc6308.twitter', function(twitter){
               $scope.feeds = twitter.getNewFeeds();
             });
             break;
