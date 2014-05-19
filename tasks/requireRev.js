@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         inputEncoding: 'utf8',
         length: 8
       },
-      paths: { // key: file path, value: requirejs dependency path
+      paths: { // key: file path base, value: requirejs dependency path base
         scripts: '' // like as requirejs baseUrl == '/scripts'
       }
     });
