@@ -43,10 +43,14 @@ module.exports = function(grunt) {
         length: 8
       },
       paths: { // key: file path, value: requirejs dependency path
-        'scripts': '', // like as requirejs baseUrl == '/scripts'
-        'styles': 'css!/styles/' // for requireCSS
+        scripts: '' // like as requirejs baseUrl == '/scripts'
       }
     });
+    
+    if(!options.hash.algorithm) options.hash.algorithm = 'md5';
+    if(!options.hash.inputEncoding) options.hash.inputEncoding = 'utf8';
+    if(!options.hash.length) options.hash.length = 'utf8';
+    if(!options.paths.scripts) options.paths.scripts = '';
     
     var dirPathPattern = new RegExp('[\\w\\d-_/.]*');
     

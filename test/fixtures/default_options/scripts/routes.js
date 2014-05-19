@@ -12,22 +12,19 @@ define('routes', [
     '/': {
       templateUrl: 'views/top.html',
       dependencies: [
-        'controllers/top',
-        'css!/styles/top'
+        'controllers/top'
       ]
     },
     '/apps': {
       templateUrl: 'views/apps.html',
       dependencies: [
-        'controllers/apps',
-        'css!/styles/apps'
+        'controllers/apps'
       ]
     },
     '/about': {
       templateUrl: 'views/about.html',
       dependencies: [
-        'controllers/about',
-        'css!/styles/about'
+        'controllers/about'
       ]
     }
     

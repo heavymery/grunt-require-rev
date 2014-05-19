@@ -3,17 +3,10 @@
 require.config({
   baseUrl: '/scripts',
   paths: { 
-    'require-css': '../bower_components/require-css/css',
     'angular': '../bower_components/angular/angular.min',
     'angular-route': '../bower_components/angular-route/angular-route.min',
     'angular-touch': '../bower_components/angular-touch/angular-touch.min',
     'angular-animate': '../bower_components/angular-animate/angular-animate.min'
-  },
-  
-  map: {
-    '*': {
-      'css': 'require-css'
-    }
   },
   
   shim: {
@@ -33,7 +26,6 @@ require.config({
 });
 
 require([
-    'require-css', 
     'angular', 
     'app', 
     'routes', 

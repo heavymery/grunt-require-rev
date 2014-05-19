@@ -12,22 +12,19 @@ define('routes', [
     '/': {
       templateUrl: 'views/top.html',
       dependencies: [
-        'controllers/19a19e3f.top',
-        'css!/styles/b3111e1d.top'
+        'controllers/19a19e3f.top'
       ]
     },
     '/apps': {
       templateUrl: 'views/apps.html',
       dependencies: [
-        'controllers/a6d5958b.apps',
-        'css!/styles/867ed5ca.apps'
+        'controllers/a6d5958b.apps'
       ]
     },
     '/about': {
       templateUrl: 'views/about.html',
       dependencies: [
-        'controllers/198131df.about',
-        'css!/styles/cad0421e.about'
+        'controllers/198131df.about'
       ]
     }
     

@@ -50,20 +50,17 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'tmp/default_options',
         src: [
-          'scripts/**/*.js',
-          'styles/**/*.css'
+          'scripts/**/*.js'
         ]
       },
       custom_options: {
         options: {
           hash: {
             algorithm: 'sha1',
-            inputEncoding: 'utf8',
             length: 16
           },
-          paths: { // key: file path, value: requirejs dependency path
-            'scripts': '', // like as requirejs baseUrl == '/scripts'
-            'styles': 'css!/styles/' // for requireCSS
+          paths: {
+            styles: 'css!/styles/' // for requireCSS
           }
         },
         expand: true,
