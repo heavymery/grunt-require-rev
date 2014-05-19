@@ -37,7 +37,7 @@ require([
     'angular', 
     '8fb5d34c.app', 
     '279acf09.routes', 
-    'controllers/0c1cb2a6.main',
+    'controllers/5daa89c5.main',
   ],
   function(requireCss, angular, app) {
     angular.bootstrap(document, [app.name]);
