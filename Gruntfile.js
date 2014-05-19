@@ -30,20 +30,28 @@ module.exports = function(grunt) {
     
     // Work on a copy of the files because they will be renamed during testing.
     copy: {
-      test: {
+      default_options: {
         expand: true,
-        cwd: 'test/fixtures/',
+        cwd: 'test/fixtures/default_options',
         src: ['scripts/**/*.js', 'styles/**/*.css'],
-        dest: 'tmp/',
+        dest: 'tmp/default_options',
+      },
+      custom_options: {
+        expand: true,
+        cwd: 'test/fixtures/custom_options',
+        src: ['scripts/**/*.js', 'styles/**/*.css'],
+        dest: 'tmp/custom_options',
       },
     },
 
     // Configuration to be run (and then tested).
     requireRev: {
       default_options: {
+        expand: true,
+        cwd: 'tmp/default_options',
         src: [
-          'tmp/scripts/**/*.js',
-          'tmp/styles/*.css'
+          'scripts/**/*.js',
+          'styles/**/*.css'
         ]
       },
       custom_options: {
@@ -59,9 +67,11 @@ module.exports = function(grunt) {
             'styles': 'css!/styles/' // for requireCSS
           }
         },
+        expand: true,
+        cwd: 'tmp/custom_options',
         src: [
-          'tmp/scripts/**/*.js',
-          'tmp/styles/*.css'
+          'scripts/**/*.js',
+          'styles/**/*.css'
         ]
       },
     },
@@ -85,8 +95,7 @@ module.exports = function(grunt) {
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
   grunt.registerTask('test', [
-    'clean', 'copy', 'requireRev:default_options', 'nodeunit',
-    //'clean', 'copy', 'require_rev:custom_options', 'nodeunit'
+    'clean', 'copy', 'requireRev', 'nodeunit',
   ]);
 
   // By default, lint and run all tests.

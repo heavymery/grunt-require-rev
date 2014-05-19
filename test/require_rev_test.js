@@ -34,11 +34,11 @@ exports.require_rev = {
     var expectedFiles = {};
     var actualFiles = {};
     
-    grunt.file.recurse('test/expected', function(abspath, rootdir, subdir, filename){
+    grunt.file.recurse('test/expected/default_options', function(abspath, rootdir, subdir, filename){
       expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
     
-    grunt.file.recurse('tmp', function(abspath, rootdir, subdir, filename){
+    grunt.file.recurse('tmp/default_options', function(abspath, rootdir, subdir, filename){
       actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
     
@@ -64,11 +64,11 @@ exports.require_rev = {
     var expectedFiles = {};
     var actualFiles = {};
     
-    grunt.file.recurse('test/expected', function(abspath, rootdir, subdir, filename){
+    grunt.file.recurse('test/expected/custom_options', function(abspath, rootdir, subdir, filename){
       expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
     
-    grunt.file.recurse('tmp', function(abspath, rootdir, subdir, filename){
+    grunt.file.recurse('tmp/custom_options', function(abspath, rootdir, subdir, filename){
       actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
     
