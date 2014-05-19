@@ -52,7 +52,7 @@ module.exports = function(grunt) {
     
     var hashPrefixPatternSource = '([a-zA-Z0-9]{' + options.hash.length + '}\\.)?';
     
-    var filePathPattern = new RegExp(hashPrefixPatternSource + '(([\\w\\d-_/.!]+)\\.(js|css|html))');
+    var filePathPattern = new RegExp(hashPrefixPatternSource + '(([\\w\\d-_/.!]+)\\.(\.[0-9a-z]+)$)');
     
     var dependencyPathPattern 
       = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
