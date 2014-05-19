@@ -26,11 +26,11 @@ var crypto = require('crypto');
 
 module.exports = function(grunt) {
   
-  var createHashFromFile = function(filepath, fileEncoding, hashAlgorithm, hashEncoding) {
+  var createHashFromFile = function(filepath, fileEncoding, hashAlgorithm) {
     var hash = crypto.createHash(hashAlgorithm);
     hash.update(grunt.file.read(filepath), fileEncoding);
     grunt.verbose.ok('Hashing ' + filepath + '...');
-    return hash.digest(hashEncoding);
+    return hash.digest('hex');
   }
   
   grunt.registerMultiTask('requireRev', 'File revisioning for requrejs.', function() {
@@ -39,7 +39,6 @@ module.exports = function(grunt) {
     var options = this.options({
       hash: {
         algorithm: 'md5',
-        encoding: 'hex',
         inputEncoding: 'utf8',
         length: 8
       },
@@ -51,7 +50,9 @@ module.exports = function(grunt) {
     
     var dirPathPattern = new RegExp('[\\w\\d-_/.]*');
     
-    var filePathPattern = new RegExp('([a-z0-9]{' + options.hash.length + '}\\.)?(([\\w\\d-_/.!]+)\\.(js|css|html))');
+    var hashPrefixPatternSource = '([a-zA-Z0-9]{' + options.hash.length + '}\\.)?';
+    
+    var filePathPattern = new RegExp(hashPrefixPatternSource + '(([\\w\\d-_/.!]+)\\.(js|css|html))');
     
     var dependencyPathPattern 
       = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
@@ -103,7 +104,7 @@ module.exports = function(grunt) {
       }
       
       // add hash prefix pattern
-      patternSource += '([a-z0-9]{' + options.hash.length + '}\\.)?';
+      patternSource += hashPrefixPatternSource;
       
       // add hash prefix
       if(pathMatch[3] && pathMatch[3].length>0) {
@@ -268,7 +269,7 @@ module.exports = function(grunt) {
       var targetPath = targetFilesSorted[i];
       var originName = path.basename(targetPath);
       
-      var hash = createHashFromFile(targetPath, options.hash.inputEncoding, options.hash.algorithm, options.hash.encoding);
+      var hash = createHashFromFile(targetPath, options.hash.inputEncoding, options.hash.algorithm);
       var prefix = hash.slice(0, options.hash.length);
       
       // clear hash prefix from file name

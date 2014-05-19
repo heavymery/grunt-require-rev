@@ -57,10 +57,9 @@ module.exports = function(grunt) {
       custom_options: {
         options: {
           hash: {
-            algorithm: 'md5',
-            encoding: 'hex',
+            algorithm: 'sha1',
             inputEncoding: 'utf8',
-            length: 8
+            length: 16
           },
           paths: { // key: file path, value: requirejs dependency path
             'scripts': '', // like as requirejs baseUrl == '/scripts'

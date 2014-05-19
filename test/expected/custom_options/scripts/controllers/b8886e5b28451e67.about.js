@@ -1,6 +1,6 @@
 'use strict';
 
-define(['8fb5d34c.app'], function(app) {
+define(['dd9943b7d47d8d43.app'], function(app) {
   
   app.controller('AboutCtrl', [
     '$scope',

@@ -2,7 +2,7 @@
 
 define('routes', [
   'angular-route',
-  '8fb5d34c.app'
+  'dd9943b7d47d8d43.app'
 ], function (ngRoute, app) {
   
   var defaultRoutePath = '/';
@@ -12,22 +12,22 @@ define('routes', [
     '/': {
       templateUrl: 'views/top.html',
       dependencies: [
-        'controllers/19a19e3f.top',
-        'css!/styles/b3111e1d.top'
+        'controllers/3bcc90986fef773c.top',
+        'css!/styles/257aba98c603815c.top'
       ]
     },
     '/apps': {
       templateUrl: 'views/apps.html',
       dependencies: [
-        'controllers/a6d5958b.apps',
-        'css!/styles/867ed5ca.apps'
+        'controllers/70efea67afb45e44.apps',
+        'css!/styles/e9c25cf627836979.apps'
       ]
     },
     '/about': {
       templateUrl: 'views/about.html',
       dependencies: [
-        'controllers/198131df.about',
-        'css!/styles/cad0421e.about'
+        'controllers/b8886e5b28451e67.about',
+        'css!/styles/ceab9a0c62514c28.about'
       ]
     }
     
@@ -53,8 +53,8 @@ define('routes', [
     
     angular.forEach(routes, function(route, path) {
       if(route == '/about') {
-        route.dependencies.push('services/d3dc6308.twitter');
-        route.dependencies.push('services/86949311.facebook');
+        route.dependencies.push('services/c447922719bf0856.twitter');
+        route.dependencies.push('services/07a6fb8f3f3d6b18.facebook');
       }
       
       $routeProvider.when(path, {
