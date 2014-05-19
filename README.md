@@ -1,4 +1,4 @@
-# grunt-require-rev
+# grunt-require-rev v0.1.0
 
 > File revisioning for RequireJS dependencies.
 This can be useful for caching and cache-busting with RequireJS.
@@ -38,21 +38,31 @@ grunt.initConfig({
 
 ### Options
 
-#### options.rev.algorithm
+#### hash.algorithm
 Type: `String`
 Default value: `'md5'`
 
-A string value that is used to do revisioning files.
+Hashing algorithm for file revisioning.
+>algorithm is dependent on the available algorithms supported by the version of OpenSSL on the platform. Examples are 'sha1', 'md5', 'sha256', 'sha512', etc. On recent releases, openssl list-message-digest-algorithms will display the available digest algorithms.
 
-#### options.rev.length
+#### hash.inputEncoding
+Type: `String`
+Default value: `'utf8'`
+
+The encoding of intput file contents.
+
+#### hash.length
 Type: `Number`
 Default value: `8`
 
-A number value that is used to do revisioning files.
+A number of hash prefix length.
 
-#### options.requirejs.baseUrl
-Type: `String`
-Default value: `'(scripts|styles)'`
+#### paths
+Type: `Objects`
+Default value: `'{ scripts: '' }'`
+
+Related file and dependency path base.
+(`key`: file path base, `value`: requirejs dependency path base)
 
 ### Usage Examples
 
@@ -61,13 +71,11 @@ Default value: `'(scripts|styles)'`
 ```js
 grunt.initConfig({
   requireRev: {
-    options: {},
-    files: {
-      src: [
-        'dist/scripts/**/*.js',
-        'dist/styles/*.css'
-      ]
-    }
+    expand: true,
+    cwd: 'dist',
+    src: [
+      'scripts/**/*.js'
+    ]
   },
 });
 ```
@@ -78,20 +86,20 @@ grunt.initConfig({
 grunt.initConfig({
   requireRev: {
     options: {
-      rev: {
-        algorithm: 'md5',
-        length: 4
+      hash: {
+        algorithm: 'sha1',
+        length: 16
       },
-      requirejs: {
-        baseUrl: '(scripts|styles)', 
+      paths: {
+        styles: 'css!/styles/' // for requireCSS
       }
     },
-    files: {
-      src: [
-        'dist/scripts/**/*.js',
-        'dist/styles/*.css'
-      ]
-    }
+    expand: true,
+    cwd: 'dist',
+    src: [
+      'scripts/**/*.js',
+      'styles/**/*.css'
+    ]
   },
 });
 ```
@@ -100,4 +108,5 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
+
+ * 2014-5-20   v0.1.0   Initial release.
