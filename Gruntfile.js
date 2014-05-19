@@ -48,12 +48,15 @@ module.exports = function(grunt) {
       },
       custom_options: {
         options: {
-          rev: {
+          hash: {
             algorithm: 'md5',
+            encoding: 'hex',
+            inputEncoding: 'utf8',
             length: 8
           },
-          requirejs: {
-            baseUrl: '(scripts|styles)', // カッコは必須
+          paths: { // key: file path, value: requirejs dependency path
+            'scripts': '', // like as requirejs baseUrl == '/scripts'
+            'styles': 'css!/styles/' // for requireCSS
           }
         },
         src: [

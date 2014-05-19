@@ -27,22 +27,64 @@ exports.require_rev = {
     // setup here if necessary
     done();
   },
+  
   default_options: function(test) {
-    //test.expect(1);
+    test.expect(1);
 
-    //var actual = grunt.file.read('tmp/default_options');
-    //var expected = grunt.file.read('test/expected/default_options');
-    //test.equal(actual, expected, 'should describe what the default behavior is.');
-
+    var expectedFiles = {};
+    var actualFiles = {};
+    
+    grunt.file.recurse('test/expected', function(abspath, rootdir, subdir, filename){
+      expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
+    });
+    
+    grunt.file.recurse('tmp', function(abspath, rootdir, subdir, filename){
+      actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
+    });
+    
+    var expected;
+    var actual;
+    
+    for(var key in expectedFiles) {
+      expected += key + expectedFiles[key];
+    }
+    
+    for(var key in actualFiles) {
+      actual += key + actualFiles[key];
+    }
+    
+    test.equal(expected, actual, 'Actual files not match to expected.');
+    
     test.done();
   },
+  
   custom_options: function(test) {
-    //test.expect(1);
+    test.expect(1);
 
-    //var actual = grunt.file.read('tmp/custom_options');
-    //var expected = grunt.file.read('test/expected/custom_options');
-    //test.equal(actual, expected, 'should describe what the custom option(s) behavior is.');
-
+    var expectedFiles = {};
+    var actualFiles = {};
+    
+    grunt.file.recurse('test/expected', function(abspath, rootdir, subdir, filename){
+      expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
+    });
+    
+    grunt.file.recurse('tmp', function(abspath, rootdir, subdir, filename){
+      actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
+    });
+    
+    var expected;
+    var actual;
+    
+    for(var key in expectedFiles) {
+      expected += key + expectedFiles[key];
+    }
+    
+    for(var key in actualFiles) {
+      actual += key + actualFiles[key];
+    }
+    
+    test.equal(expected, actual, 'Actual files not match to expected.');
+    
     test.done();
   },
 };
