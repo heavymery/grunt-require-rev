@@ -5,8 +5,7 @@ define(['app'], function(app) {
   app.controller('MainCtrl', [
     '$scope',
     '$location',
-    '$routeParams',
-    function($scope, $location, $routeParams) {
+    function($scope, $location) {
       
       $scope.navigate = function(path, search) {
         if(path) {
@@ -17,14 +16,6 @@ define(['app'], function(app) {
           $location.search(search);
         }
       };
-      
-      $scope.currentPath = '/';
-      
-      $scope.$on('$routeChangeSuccess', function($event, current) {
-        $scope.currentPath = $location.$$path;
-      });
-      
-      $scope.routeParams = $routeParams;
       
     }
   ]);

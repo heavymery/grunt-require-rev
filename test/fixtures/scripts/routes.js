@@ -9,10 +9,6 @@ define([
   
   var routes = {
     
-    //--------------------------------------
-    //  Root
-    //--------------------------------------
-    
     '/': {
       templateUrl: 'views/top.html',
       dependencies: [
@@ -21,55 +17,21 @@ define([
       ]
     },
     '/apps': {
-      templateUrl: 'views/top.html',
+      templateUrl: 'views/apps.html',
       dependencies: [
-        'controllers/top',
-        'css!/styles/top'
+        'controllers/apps',
+        'css!/styles/apps'
       ]
     },
     '/about': {
-      templateUrl: 'views/top.html',
+      templateUrl: 'views/about.html',
       dependencies: [
-        'controllers/top',
-        'css!/styles/top'
-      ]
-    },
-    
-    //--------------------------------------
-    //  Guitar Tools
-    //--------------------------------------
-    
-    
-    //--------------------------------------
-    //  D Cre
-    //--------------------------------------
-    
-    '/dcre': {
-      //templateUrl: 'views/dcre/top.html',
-      templateUrl: 'views/dcre/main.html',
-      dependencies: [
-        'controllers/dcre/main',
-        'css!/styles/dcre'
-      ]
-    },
-    '/dcre/archives': {
-      templateUrl: 'views/dcre/archives.html',
-      dependencies: [
-        'controllers/dcre',
-        'css!/styles/dcre'
-      ]
-    },
-    '/dcre/take/:themeId': {
-      templateUrl: 'views/dcre/take.html',
-      dependencies: [
-        'controllers/dcre',
-        'css!/styles/dcre',
-        'directives/headtrackr'
+        'controllers/about',
+        'css!/styles/about'
       ]
     }
     
   };
-  
   
   var dependencyResolver = function(dependencies) {
     return {
@@ -87,7 +49,6 @@ define([
     };
   };
   
-  
   app.config(['$routeProvider', function($routeProvider) {
     
     angular.forEach(routes, function(route, path) {
@@ -100,6 +61,5 @@ define([
     $routeProvider.otherwise({redirectTo:routes.defaultRoutePaths});
     
   }]);
-  
   
 });
