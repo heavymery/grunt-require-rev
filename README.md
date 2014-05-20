@@ -80,6 +80,42 @@ grunt.initConfig({
 });
 ```
 
+Before: 
+
+```
++- dist
+|   +- scripts
+|       +- bootstrap.js
+|       +- app.js
+|       +- routes.js
+|       +- controllers
+|          +- main.js
+|          +- top.js
+|          +- apps.js
+|          +- about.js
+|       +- services
+|          +- facebook.js
+|          +- twitter.js
+```
+
+After: 
+
+```
++- dist
+|   +- scripts
+|       +- bd7daeb5.bootstrap.js
+|       +- 8fb5d34c.app.js
+|       +- 4573763f.routes.js
+|       +- controllers
+|          +- 5daa89c5.main.js
+|          +- 19a19e3f.top.js
+|          +- a6d5958b.apps.js
+|          +- 198131df.about.js
+|       +- services
+|          +- 86949311.facebook.js
+|          +- d3dc6308.twitter.js
+```
+
 #### Custom Options
 
 ```js
