@@ -68,7 +68,7 @@ Related file and dependency path base.
 
 #### Default Options
 
-Revisioning all target files and replace dependency paths.
+Revisioning all target js files and replace dependency paths.
 
 ```js
 grunt.initConfig({
@@ -100,7 +100,7 @@ Before:
 |          +- twitter.js
 ```
 
-```js
+```javascript
 /* bootstrap.js */
 require([
     'angular', 
@@ -177,7 +177,7 @@ After:
 |          +- d3dc6308.twitter.js
 ```
 
-```js
+```javascript
 /* bd7daeb5.bootstrap.js */
 require([
     'angular', 
@@ -238,7 +238,9 @@ define(['8fb5d34c.app'], function(app) {
 
 #### Custom Options
 
-```js
+Revisioning all target js/css files and replace dependency paths.
+
+```javascript
 grunt.initConfig({
   requireRev: {
     options: {
@@ -258,6 +260,105 @@ grunt.initConfig({
     ]
   },
 });
+```
+
+Before: 
+
+```
++- dist
+|   +- scripts
+|       +- bootstrap.js
+|       +- app.js
+|       +- routes.js
+|       +- controllers
+|          +- main.js
+|          +- top.js
+|          +- apps.js
+|          +- about.js
+|       +- services
+|          +- facebook.js
+|          +- twitter.js
+|   +- styles
+|       +- main.css
+|       +- top.css
+|       +- apps.css
+|       +- about.css
+```
+
+```javascript
+/* routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/top',
+      'css!/styles/top'
+    ]
+  },
+  '/apps': {
+    templateUrl: 'views/apps.html',
+    dependencies: [
+      'controllers/apps',
+      'css!/styles/apps'
+    ]
+  },
+  '/about': {
+    templateUrl: 'views/about.html',
+    dependencies: [
+      'controllers/about',
+      'css!/styles/about'
+    ]
+  }
+};
+```
+
+After: 
+```
++- dist
+|   +- scripts
+|       +- d60a58b6c4f45880.bootstrap.js
+|       +- dd9943b7d47d8d43.app.js
+|       +- 6a27ce6da391c09a.routes.js
+|       +- controllers
+|          +- 048b941d60f40cf2.main.js
+|          +- 3bcc90986fef773c.top.js
+|          +- 70efea67afb45e44.apps.js
+|          +- b8886e5b28451e67.about.js
+|       +- services
+|          +- 07a6fb8f3f3d6b18.facebook.js
+|          +- c447922719bf0856.twitter.js
+|   +- styles
+|       +- 5ceb948efe08c8b4.main.css
+|       +- 257aba98c603815c.top.css
+|       +- e9c25cf627836979.apps.css
+|       +- ceab9a0c62514c28.about.css
+```
+
+```javascript
+/* 6a27ce6da391c09a.routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/3bcc90986fef773c.top',
+      'css!/styles/257aba98c603815c.top'
+    ]
+  },
+  '/apps': {
+    templateUrl: 'views/apps.html',
+    dependencies: [
+      'controllers/70efea67afb45e44.apps',
+      'css!/styles/e9c25cf627836979.apps'
+    ]
+  },
+  '/about': {
+    templateUrl: 'views/about.html',
+    dependencies: [
+      'controllers/b8886e5b28451e67.about',
+      'css!/styles/ceab9a0c62514c28.about'
+    ]
+  }
+};
 ```
 
 ## Contributing
