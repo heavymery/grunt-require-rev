@@ -100,7 +100,7 @@ Before:
 |          +- twitter.js
 ```
 
-```javascript
+```js
 /* bootstrap.js */
 require([
     'angular', 
@@ -177,7 +177,7 @@ After:
 |          +- d3dc6308.twitter.js
 ```
 
-```javascript
+```js
 /* bd7daeb5.bootstrap.js */
 require([
     'angular', 
@@ -240,7 +240,7 @@ define(['8fb5d34c.app'], function(app) {
 
 Revisioning all target js/css files and replace dependency paths.
 
-```javascript
+```js
 grunt.initConfig({
   requireRev: {
     options: {
@@ -285,7 +285,7 @@ Before:
 |       +- about.css
 ```
 
-```javascript
+```js
 /* routes.js */
 var routes = {
   '/': {
@@ -334,7 +334,7 @@ After:
 |       +- ceab9a0c62514c28.about.css
 ```
 
-```javascript
+```js
 /* 6a27ce6da391c09a.routes.js */
 var routes = {
   '/': {
