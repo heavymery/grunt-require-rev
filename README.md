@@ -68,6 +68,8 @@ Related file and dependency path base.
 
 #### Default Options
 
+Revisioning all target files and replace dependency paths.
+
 ```js
 grunt.initConfig({
   requireRev: {
@@ -98,6 +100,65 @@ Before:
 |          +- twitter.js
 ```
 
+```js
+/* bootstrap.js */
+require([
+    'angular', 
+    'app', 
+    'routes', 
+    'controllers/main',
+  ],
+  function(requireCss, angular, app) {
+    angular.bootstrap(document, [app.name]);
+  }
+);
+
+/* routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/top'
+    ]
+  }
+}
+
+angular.forEach(routes, function(route, path) {
+  if(route == '/about') {
+    route.dependencies.push('services/twitter');
+    route.dependencies.push('services/facebook');
+  }
+});
+
+/* controllers/main.js */
+define(['app'], function(app) {
+  
+  app.controller('MainCtrl', [
+    '$scope',
+    '$location',
+    function($scope, $location) {
+    
+      $scope.getNewFeeds = function() {
+        switch($scope.selectedSNSType) {
+          case 'facebook':
+            require('services/facebook', function(facebook){
+              $scope.feeds = facebook.getNewFeeds();
+            });
+            break;
+          case 'twitter':
+            require('services/twitter', function(twitter){
+              $scope.feeds = twitter.getNewFeeds();
+            });
+            break;
+        }
+      }
+      
+    }
+  ]);
+  
+});
+```
+
 After: 
 
 ```
@@ -114,6 +175,65 @@ After:
 |       +- services
 |          +- 86949311.facebook.js
 |          +- d3dc6308.twitter.js
+```
+
+```js
+/* bd7daeb5.bootstrap.js */
+require([
+    'angular', 
+    '8fb5d34c.app', 
+    '4573763f.routes', 
+    'controllers/5daa89c5.main',
+  ],
+  function(requireCss, angular, app) {
+    angular.bootstrap(document, [app.name]);
+  }
+);
+
+/* 4573763f.routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/19a19e3f.top'
+    ]
+  }
+}
+
+angular.forEach(routes, function(route, path) {
+  if(route == '/about') {
+    route.dependencies.push('services/86949311.facebook');
+    route.dependencies.push('services/d3dc6308.twitter');
+  }
+});
+
+/* controllers/5daa89c5.main.js */
+define(['8fb5d34c.app'], function(app) {
+  
+  app.controller('MainCtrl', [
+    '$scope',
+    '$location',
+    function($scope, $location) {
+    
+      $scope.getNewFeeds = function() {
+        switch($scope.selectedSNSType) {
+          case 'facebook':
+            require('services/86949311.facebook', function(facebook){
+              $scope.feeds = facebook.getNewFeeds();
+            });
+            break;
+          case 'twitter':
+            require('services/d3dc6308.twitter', function(twitter){
+              $scope.feeds = twitter.getNewFeeds();
+            });
+            break;
+        }
+      }
+      
+    }
+  ]);
+  
+});
 ```
 
 #### Custom Options
