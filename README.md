@@ -68,6 +68,8 @@ Related file and dependency path base.
 
 #### Default Options
 
+Revisioning all target js files and replace dependency paths.
+
 ```js
 grunt.initConfig({
   requireRev: {
@@ -80,7 +82,163 @@ grunt.initConfig({
 });
 ```
 
+Before: 
+
+```
++- dist
+|   +- scripts
+|       +- bootstrap.js
+|       +- app.js
+|       +- routes.js
+|       +- controllers
+|          +- main.js
+|          +- top.js
+|          +- apps.js
+|          +- about.js
+|       +- services
+|          +- facebook.js
+|          +- twitter.js
+```
+
+```js
+/* bootstrap.js */
+require([
+    'angular', 
+    'app', 
+    'routes', 
+    'controllers/main',
+  ],
+  function(requireCss, angular, app) {
+    angular.bootstrap(document, [app.name]);
+  }
+);
+
+/* routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/top'
+    ]
+  }
+}
+
+angular.forEach(routes, function(route, path) {
+  if(route == '/about') {
+    route.dependencies.push('services/twitter');
+    route.dependencies.push('services/facebook');
+  }
+});
+
+/* controllers/main.js */
+define(['app'], function(app) {
+  
+  app.controller('MainCtrl', [
+    '$scope',
+    '$location',
+    function($scope, $location) {
+    
+      $scope.getNewFeeds = function() {
+        switch($scope.selectedSNSType) {
+          case 'facebook':
+            require('services/facebook', function(facebook){
+              $scope.feeds = facebook.getNewFeeds();
+            });
+            break;
+          case 'twitter':
+            require('services/twitter', function(twitter){
+              $scope.feeds = twitter.getNewFeeds();
+            });
+            break;
+        }
+      }
+      
+    }
+  ]);
+  
+});
+```
+
+After: 
+
+```
++- dist
+|   +- scripts
+|       +- bd7daeb5.bootstrap.js
+|       +- 8fb5d34c.app.js
+|       +- 4573763f.routes.js
+|       +- controllers
+|          +- 5daa89c5.main.js
+|          +- 19a19e3f.top.js
+|          +- a6d5958b.apps.js
+|          +- 198131df.about.js
+|       +- services
+|          +- 86949311.facebook.js
+|          +- d3dc6308.twitter.js
+```
+
+```js
+/* bd7daeb5.bootstrap.js */
+require([
+    'angular', 
+    '8fb5d34c.app', 
+    '4573763f.routes', 
+    'controllers/5daa89c5.main',
+  ],
+  function(requireCss, angular, app) {
+    angular.bootstrap(document, [app.name]);
+  }
+);
+
+/* 4573763f.routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/19a19e3f.top'
+    ]
+  }
+}
+
+angular.forEach(routes, function(route, path) {
+  if(route == '/about') {
+    route.dependencies.push('services/86949311.facebook');
+    route.dependencies.push('services/d3dc6308.twitter');
+  }
+});
+
+/* controllers/5daa89c5.main.js */
+define(['8fb5d34c.app'], function(app) {
+  
+  app.controller('MainCtrl', [
+    '$scope',
+    '$location',
+    function($scope, $location) {
+    
+      $scope.getNewFeeds = function() {
+        switch($scope.selectedSNSType) {
+          case 'facebook':
+            require('services/86949311.facebook', function(facebook){
+              $scope.feeds = facebook.getNewFeeds();
+            });
+            break;
+          case 'twitter':
+            require('services/d3dc6308.twitter', function(twitter){
+              $scope.feeds = twitter.getNewFeeds();
+            });
+            break;
+        }
+      }
+      
+    }
+  ]);
+  
+});
+```
+
 #### Custom Options
+
+Revisioning all target js/css files and replace dependency paths.
 
 ```js
 grunt.initConfig({
@@ -102,6 +260,105 @@ grunt.initConfig({
     ]
   },
 });
+```
+
+Before: 
+
+```
++- dist
+|   +- scripts
+|       +- bootstrap.js
+|       +- app.js
+|       +- routes.js
+|       +- controllers
+|          +- main.js
+|          +- top.js
+|          +- apps.js
+|          +- about.js
+|       +- services
+|          +- facebook.js
+|          +- twitter.js
+|   +- styles
+|       +- main.css
+|       +- top.css
+|       +- apps.css
+|       +- about.css
+```
+
+```js
+/* routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/top',
+      'css!/styles/top'
+    ]
+  },
+  '/apps': {
+    templateUrl: 'views/apps.html',
+    dependencies: [
+      'controllers/apps',
+      'css!/styles/apps'
+    ]
+  },
+  '/about': {
+    templateUrl: 'views/about.html',
+    dependencies: [
+      'controllers/about',
+      'css!/styles/about'
+    ]
+  }
+};
+```
+
+After: 
+```
++- dist
+|   +- scripts
+|       +- d60a58b6c4f45880.bootstrap.js
+|       +- dd9943b7d47d8d43.app.js
+|       +- 6a27ce6da391c09a.routes.js
+|       +- controllers
+|          +- 048b941d60f40cf2.main.js
+|          +- 3bcc90986fef773c.top.js
+|          +- 70efea67afb45e44.apps.js
+|          +- b8886e5b28451e67.about.js
+|       +- services
+|          +- 07a6fb8f3f3d6b18.facebook.js
+|          +- c447922719bf0856.twitter.js
+|   +- styles
+|       +- 5ceb948efe08c8b4.main.css
+|       +- 257aba98c603815c.top.css
+|       +- e9c25cf627836979.apps.css
+|       +- ceab9a0c62514c28.about.css
+```
+
+```js
+/* 6a27ce6da391c09a.routes.js */
+var routes = {
+  '/': {
+    templateUrl: 'views/top.html',
+    dependencies: [
+      'controllers/3bcc90986fef773c.top',
+      'css!/styles/257aba98c603815c.top'
+    ]
+  },
+  '/apps': {
+    templateUrl: 'views/apps.html',
+    dependencies: [
+      'controllers/70efea67afb45e44.apps',
+      'css!/styles/e9c25cf627836979.apps'
+    ]
+  },
+  '/about': {
+    templateUrl: 'views/about.html',
+    dependencies: [
+      'controllers/b8886e5b28451e67.about',
+      'css!/styles/ceab9a0c62514c28.about'
+    ]
+  }
+};
 ```
 
 ## Contributing
