@@ -223,29 +223,42 @@ module.exports = function(grunt) {
     // 3. order by dependencies
     //--------------------------------------
     
-    var targetFilesSorted = [];
-    
-    while(targetFiles.length > 0) {
-      if(targetFilesSorted.length > 0) {
-        var nextTarget = targetFiles.pop();
-        
-        for(var i=0; i<targetFilesSorted.length; i++) {
-          var targetFile = targetFilesSorted[i];
-          var dependencies = dependenciesMap[targetFile].dependencies;
+    var targetFilesSorted;
+
+    var sortByDependencies = function(targetFiles) {
+      var sorted = [];
+
+      while(targetFiles.length > 0) {
+        if(sorted.length > 0) {
+          var nextTarget = targetFiles.pop();
+
+          for(var i=0; i<sorted.length; i++) {
+            var targetFile = sorted[i];
           
-          var dependencyMatch = matchPatternFromArray(dependencies, dependenciesMap[nextTarget].dependencyPath.pattern);
-          
-          if(dependencyMatch) {
-            break;
+            var dependencies = dependenciesMap[targetFile].dependencies;
+            
+            var dependencyMatch = matchPatternFromArray(dependencies, dependenciesMap[nextTarget].dependencyPath.pattern);
+            
+            if(dependencyMatch) {
+              break;
+            }
           }
+          
+          // move dependent file to front
+          sorted.splice(i, 0, nextTarget);
+          
+        } else {
+          sorted.push(targetFiles.pop());
         }
-        
-        // move dependent file to front
-        targetFilesSorted.splice(i, 0, nextTarget);
-        
-      } else {
-        targetFilesSorted.push(targetFiles.pop());
       }
+
+      return sorted;
+    };
+
+    var sortCount = targetFiles.length;
+    
+    while(--sortCount < 0) {
+      targetFilesSorted = sortByDependencies(targetFiles);
     }
     
     grunt.verbose.writeln();
@@ -296,6 +309,7 @@ module.exports = function(grunt) {
         var otherPath = targetFilesSorted[j];
         
         var dependencyMatch = matchPatternFromArray(dependenciesMap[otherPath].dependencies, dependenciesMap[targetPath].dependencyPath.pattern);
+        
         if(dependencyMatch) {
           grunt.verbose.ok('Replace require path for ' + otherPath + '...');
 
