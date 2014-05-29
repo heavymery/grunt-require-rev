@@ -223,17 +223,15 @@ module.exports = function(grunt) {
     // 3. order by dependencies
     //--------------------------------------
     
-    var targetFilesSorted;
+    var sortByDependencies = function(source) {
+      var result = [];
 
-    var sortByDependencies = function(targetFiles) {
-      var sorted = [];
+      while(source.length > 0) {
+        if(result.length > 0) {
+          var nextTarget = source.pop();
 
-      while(targetFiles.length > 0) {
-        if(sorted.length > 0) {
-          var nextTarget = targetFiles.pop();
-
-          for(var i=0; i<sorted.length; i++) {
-            var targetFile = sorted[i];
+          for(var i=0; i<result.length; i++) {
+            var targetFile = result[i];
           
             var dependencies = dependenciesMap[targetFile].dependencies;
             
@@ -245,21 +243,23 @@ module.exports = function(grunt) {
           }
           
           // move dependent file to front
-          sorted.splice(i, 0, nextTarget);
+          result.splice(i, 0, nextTarget);
           
         } else {
-          sorted.push(targetFiles.pop());
+          result.push(source.pop());
         }
       }
 
-      return sorted;
+      return result;
     };
 
-    var sortCount = targetFiles.length;
-    
-    while(--sortCount < 0) {
-      targetFilesSorted = sortByDependencies(targetFiles);
+    var targetFilesSorted = targetFiles;
+    var sortCount = targetFilesSorted.length;
+    while(sortCount-- > 0) {
+      targetFilesSorted = sortByDependencies(targetFilesSorted);
     }
+
+    //console.log(targetFilesSorted);
     
     grunt.verbose.writeln();
     
