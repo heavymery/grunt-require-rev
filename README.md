@@ -366,4 +366,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+ * 2014-5-29   v0.1.1   Update dependency sorting algorithm.
  * 2014-5-20   v0.1.0   Initial release.
