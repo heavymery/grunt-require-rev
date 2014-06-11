@@ -59,13 +59,13 @@ module.exports = function(grunt) {
     var filePathPattern = new RegExp(hashPrefixPatternSource + '(([\\w\\d-_/.!]+)\\.(\.[0-9a-z]+)$)');
     
     var dependencyPathPattern 
-      = new RegExp('(\'|")[\\w\\d-_/.!]+(\'|")','g');
+      = new RegExp('(\'|")[\\w\\d-_/.!\\,\\:\\[\\]]+(\'|")','g');
       // e.g. 'app', "controllers/main", "css!/styles/main"
     
     var definePattern 
       = new RegExp('define\\s*\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\s*\\]', 'ig');
       // e.g. define("moduleName",["app","controllers/main"]... define(["app","controllers/main"]...
-    
+
     var requirePattern 
       = new RegExp('(require\\s*\\(\\s*\\[\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*\\]\\s*)|(require\\s*\\(\\s*(' + dependencyPathPattern.source + '\\s*,?\\s*)*)', 'ig');
       // e.g. require(['app']... require('app'...
