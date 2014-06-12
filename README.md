@@ -1,4 +1,4 @@
-# grunt-require-rev v0.1.0
+# grunt-require-rev
 
 > File revisioning for RequireJS dependencies.
 This can be useful for caching and cache-busting with RequireJS.
