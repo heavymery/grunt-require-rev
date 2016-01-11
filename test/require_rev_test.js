@@ -27,64 +27,64 @@ exports.require_rev = {
     // setup here if necessary
     done();
   },
-  
+
   default_options: function(test) {
     test.expect(1);
 
     var expectedFiles = {};
     var actualFiles = {};
-    
+
     grunt.file.recurse('test/expected/default_options', function(abspath, rootdir, subdir, filename){
       expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
-    
+
     grunt.file.recurse('tmp/default_options', function(abspath, rootdir, subdir, filename){
       actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
-    
+
     var expected;
     var actual;
-    
-    for(var key in expectedFiles) {
-      expected += key + expectedFiles[key];
+
+    for(var expectedFile in expectedFiles) {
+      expected += expectedFile + expectedFiles[expectedFile];
     }
-    
-    for(var key in actualFiles) {
-      actual += key + actualFiles[key];
+
+    for(var actualFile in actualFiles) {
+      actual += actualFile + actualFiles[actualFile];
     }
-    
+
     test.equal(expected, actual, 'Actual files not match to expected.');
-    
+
     test.done();
   },
-  
+
   custom_options: function(test) {
     test.expect(1);
 
     var expectedFiles = {};
     var actualFiles = {};
-    
+
     grunt.file.recurse('test/expected/custom_options', function(abspath, rootdir, subdir, filename){
       expectedFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
-    
+
     grunt.file.recurse('tmp/custom_options', function(abspath, rootdir, subdir, filename){
       actualFiles[subdir + '/' + filename] = grunt.file.read(abspath);
     });
-    
+
     var expected;
     var actual;
-    
-    for(var key in expectedFiles) {
-      expected += key + expectedFiles[key];
+
+    for(var expectedFile in expectedFiles) {
+      expected += expectedFile + expectedFiles[expectedFile];
     }
-    
-    for(var key in actualFiles) {
-      actual += key + actualFiles[key];
+
+    for(var actualFile in actualFiles) {
+      actual += actualFile + actualFiles[actualFile];
     }
-    
+
     test.equal(expected, actual, 'Actual files not match to expected.');
-    
+
     test.done();
   },
 };
