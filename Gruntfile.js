@@ -27,13 +27,13 @@ module.exports = function(grunt) {
     clean: {
       tests: ['tmp/**/*'],
     },
-    
+
     // Work on a copy of the files because they will be renamed during testing.
     copy: {
       default_options: {
         expand: true,
         cwd: 'test/fixtures/default_options',
-        src: ['scripts/**/*.js', 'styles/**/*.css'],
+        src: ['scripts/**/*.js'],
         dest: 'tmp/default_options',
       },
       custom_options: {
