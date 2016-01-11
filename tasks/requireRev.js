@@ -136,7 +136,7 @@ module.exports = function(grunt) {
       }
 
       // create regular expression
-      var pattern = new RegExp(patternSource, 'ig');
+      var pattern = new RegExp('(\\.\/)?'+ patternSource, 'ig');
 
       return {
         path: path,
@@ -317,6 +317,9 @@ module.exports = function(grunt) {
 
       // replace dependency path
       dependenciesMap[targetPath].dependencyPath = fileToDependencyPath(targetPathNew);
+      grunt.verbose.writeln('New target path: ' + targetPathNew);
+      grunt.verbose.writeln('New dependency path: ' + JSON.stringify(dependenciesMap[targetPath].dependencyPath));
+      grunt.verbose.writeln(dependenciesMap[targetPath].dependencyPath.pattern);
 
       for(var j=i+1; j<targetFilesSorted.length; j++) {
         var otherPath = targetFilesSorted[j];
@@ -330,7 +333,7 @@ module.exports = function(grunt) {
 
           grunt.file.write(otherPath, contents.replace(
             new RegExp('("|\')' + dependenciesMap[targetPath].dependencyPath.pattern.source + '("|\')', 'ig'),
-            '$1' + dependenciesMap[targetPath].dependencyPath.path + '$3'
+            '$1' + '$2' + dependenciesMap[targetPath].dependencyPath.path + '$4'
           ));
         }
       }
